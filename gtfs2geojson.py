@@ -14,11 +14,21 @@ except ImportError:
 	from StringIO import StringIO
 from datetime import timedelta
 from decimal import Decimal
+import json
+
+class DecimalEncoder(geojson.GeoJSONEncoder):
+    def _iterencode(self, o, markers=None):
+        if isinstance(o, decimal.Decimal):
+            # wanted a simple yield str(o) in the next line,
+            # but that would mean a yield on the line with super(...),
+            # which wouldn't work (see my comment below), so...
+            return float(o)
+        return super(DecimalEncoder, self)._iterencode(o, markers)
 
 def gtfs_stops(gtfs, output_f):
 	"""
 	For each stop, convert it into a GeoJSON Point, and make all of it's attributes available.
-	
+
 	:param gtfs file: Input GTFS ZIP.
 	:param output_f file: Output GeoJSON file stream.
 	"""
@@ -52,7 +62,7 @@ def gtfs_stops(gtfs, output_f):
 			properties=props,
 			id=row[id_col]
 		))
-	
+
 	geojson.dump(output_layer, output_f)
 
 def time_as_timedelta(time):
@@ -67,12 +77,12 @@ def gtfs_routes(gtfs, output_f):
 	"""
 	For each route, convert it's 'shape' into a GeoJSON LineString, and make all
 	of it's attributes available.
-	
+
 	:param gtfs file: Input GTFS ZIP
 	:param output_f file: Output GeoJSON file stream.
-	
+
 	"""
-	
+
 	# Load up the stop times so we can find which are the best routes.
 	stoptimes_c = csv.reader(swallow_windows_unicode(gtfs.open('stop_times.txt', 'r')))
 	header = stoptimes_c.next()
@@ -216,7 +226,7 @@ def gtfs_routes(gtfs, output_f):
 		))
 
 	# now flush the GeoJSON layer to a file.
-	geojson.dump(output_layer, output_f)
+	geojson.dump(output_layer, output_f, cls=DecimalEncoder)
 
 
 def swallow_windows_unicode(fileobj, rewind=True):
@@ -255,7 +265,7 @@ def swallow_windows_unicode(fileobj, rewind=True):
 
 def main():
 	parser = argparse.ArgumentParser()
-	
+
 	parser.add_argument('-o', '--output',
 		required=True,
 		type=argparse.FileType('wb'),
@@ -265,13 +275,13 @@ def main():
 	parser.add_argument('input_gtfs',
 		type=argparse.FileType('rb'),
 		help='Path to GTFS ZIP file to extract data from.')
-	
+
 	group = parser.add_mutually_exclusive_group(required=True)
-	
+
 	group.add_argument('-r', '--routes',
 		action='store_true',
 		help='Route conversion mode')
-	
+
 	group.add_argument('-s', '--stops',
 		action='store_true',
 		help='Stop conversion mode')
@@ -282,7 +292,7 @@ def main():
 
 	# Open ZIP
 	gtfs = zipfile.ZipFile(options.input_gtfs, 'r')
-	
+
 	if options.routes:
 		gtfs_routes(gtfs, options.output)
 	elif options.stops:
@@ -290,4 +300,3 @@ def main():
 
 if __name__ == '__main__':
 	main()
-
