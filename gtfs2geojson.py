@@ -7,21 +7,17 @@ Copyright 2014-2015 Michael Farrell <http://micolous.id.au>
 License: 3-clause BSD, see COPYING
 """
 
-import geojson, argparse, csv, zipfile
+import geojson, argparse, csv, zipfile, simplejson
 try:
 	from cStringIO import StringIO
 except ImportError:
 	from StringIO import StringIO
 from datetime import timedelta
 from decimal import Decimal
-import json
 
 class DecimalEncoder(geojson.GeoJSONEncoder):
     def _iterencode(self, o, markers=None):
         if isinstance(o, decimal.Decimal):
-            # wanted a simple yield str(o) in the next line,
-            # but that would mean a yield on the line with super(...),
-            # which wouldn't work (see my comment below), so...
             return float(o)
         return super(DecimalEncoder, self)._iterencode(o, markers)
 
