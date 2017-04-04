@@ -1,5 +1,7 @@
 # geojsontools #
 
+This repository is an updated version of [another repo](https://github.com/micolous/geojsontools). 
+
 Some small tools to work with GeoJSON files, using the [python-geojson](https://github.com/frewsxcv/python-geojson) library.
 
 These typically focus on small utilities in order to convert data between different formats, or perform operations that are difficult or impossible to do inside of software like `gpsbabel`, `ogr2ogr` or QGIS.
