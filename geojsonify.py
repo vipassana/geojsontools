@@ -15,13 +15,15 @@ from decimal import Decimal
 
 def geojsonifyme(input_f, output_f, force_lat_factor=None, force_lon_factor=None):
 	input_obj = simplejson.load(input_f, use_decimal=True)
+	print(type(input_f))
+	print(type(input_obj))
 	output_layer = geojson.FeatureCollection([])
 	# assume WGS84 CRS
 	output_layer.crs = geojson.crs.Named(properties=dict(name='urn:ogc:def:crs:OGC:1.3:CRS84'))
-	
+
 	# load what the fields in this array are
 	first_keys = set(input_obj[0].keys())
-	
+
 	# find a lat value
 	id_key = lat_key = long_key = None
 	for k in first_keys:
@@ -34,7 +36,7 @@ def geojsonifyme(input_f, output_f, force_lat_factor=None, force_lon_factor=None
 		if lat_key is not None and long_key is not None and id_key is not None:
 			# we're done, drop out now
 			break
-	
+
 	if lat_key is None:
 		raise ValueError, 'Could not guess key with latitude'
 	if long_key is None:
@@ -78,7 +80,7 @@ def geojsonifyme(input_f, output_f, force_lat_factor=None, force_lon_factor=None
 			id = props[id_key]
 			# Don't strip this field and instead include it twice
 			# as some programs don't read from this ID field.
-			
+
 
 		output_layer.features.append(geojson.Feature(
 			geometry=geojson.Point(
@@ -101,7 +103,7 @@ def main():
 	parser.add_argument('input', nargs=1, help='Input JSON file')
 	parser.add_argument('-o', '--output', required=True, type=argparse.FileType('wb'), help='Output GeoJSON file')
 
-	parser.add_argument('-t', '--force-lat-factor', type=int
+	parser.add_argument('-t', '--force-lat-factor', type=int,
 		help='Force a particular latitude factor')
 	parser.add_argument('-n', '--force-lon-factor', type=int,
 		help='Force a particular longitude factor')
