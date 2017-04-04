@@ -157,11 +157,8 @@ For example, in order to create GeoJSON shape files describing the stops and rou
 
 ```console
 $ wget http://adelaidemetro.com.au/GTFS/google_transit.zip
-$ mkdir metro
-$ cd metro
-$ unzip ../google_transit.zip
-$ python ../gtfs2geojson.py -o AdelaideMetro-routes.geojson -r routes.txt -s shapes.txt -t trips.txt
-$ python ../gtfs2geojson.py -o AdelaideMetro-stops.geojson -p stops.txt
+$ python gtfs2geojson.py -o AdelaideMetro-routes.geojson  -r  google_transit.zip
+$ python gtfs2geojson.py -o AdelaideMetro-stops.geojson -s google_transit.zip
 ```
 
 ### marking up gtfs-converted data ###
@@ -177,7 +174,7 @@ This will add a `#` character to the start of the colours so that Qt will recogn
 For labels, use a data defined property like this, in order to add Unicode icons for each of the transport types.  Note that you'll require Unicode 6.0 support and a font that includes the "Transport and Map Symbols" block.
 
 ```
-CONCAT((CASE 
+CONCAT((CASE
 WHEN "route_type" = '0' THEN '🚊'
 WHEN "route_type" = '1' THEN '🚇'
 WHEN "route_type" = '2' THEN '🚆'
@@ -196,5 +193,3 @@ END
 After some other minor tweaks, QGIS will give you output that looks like this:
 
 ![Adelaide Metro route map](/examples/adelaidemetro.png?raw=true)
-
-
