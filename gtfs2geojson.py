@@ -131,7 +131,7 @@ def gtfs_routes(gtfs, output_f):
 
 		# Calculate length according to GTFS
 		# This could also be calculated by the geometry, but we trust GTFS, right...
-		if shape_dist_col is not None:
+		if shape_dist_col is not None and row[shape_dist_col]:
 			length = Decimal(row[shape_dist_col])
 			if row[shape_id_col] not in shape_lengths or shape_lengths[row[shape_id_col]] < length:
 				shape_lengths[row[shape_id_col]] = length
@@ -209,7 +209,7 @@ def gtfs_routes(gtfs, output_f):
 
 		props['shape_id'] = trips[row[route_id_col]]
 		props['shape_refs'] = trips_ref[row[route_id_col]][props['shape_id']]
-		if shape_dist_col is not None:
+		if shape_dist_col is not None and len(shape_lengths) > 0:
 			props['shape_length'] = shape_lengths[props['shape_id']]
 		props['duration_sec'] = (route_time[row[route_id_col]][3] - route_time[row[route_id_col]][2]).total_seconds()
 
