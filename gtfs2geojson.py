@@ -3,6 +3,8 @@
 gtfs2geojson
 Converts GTFS data into GeoJSON format
 Copyright 2014-2015 Michael Farrell <http://micolous.id.au>
+Copyright 2019 Vipassana Vijayarangan
+
 
 License: 3-clause BSD, see COPYING
 """
@@ -28,7 +30,10 @@ def gtfs_stops(gtfs, output_f):
 	:param gtfs file: Input GTFS ZIP.
 	:param output_f file: Output GeoJSON file stream.
 	"""
-	stops_c = csv.reader(swallow_windows_unicode(gtfs.open('stops.txt', 'r')))
+	#TODO
+	stops_file = [x for x in gtfs.namelist() if 'stops' in x][0]
+
+	stops_c = csv.reader(swallow_windows_unicode(gtfs.open(stops_file, 'r')))
 
 	output_layer = geojson.FeatureCollection([])
 	# assume WGS84 CRS
@@ -80,7 +85,10 @@ def gtfs_routes(gtfs, output_f):
 	"""
 
 	# Load up the stop times so we can find which are the best routes.
-	stoptimes_c = csv.reader(swallow_windows_unicode(gtfs.open('stop_times.txt', 'r')))
+	#TODO
+	stop_times_file = [x for x in gtfs.namelist() if 'stop_times' in x][0]
+
+	stoptimes_c = csv.reader((gtfs.open(stop_times_file, 'r')))
 	header = stoptimes_c.next()
 	trip_id_col = header.index('trip_id')
 	arrtime_col = header.index('arrival_time')
@@ -112,7 +120,9 @@ def gtfs_routes(gtfs, output_f):
 	# Load the shapes into a map that we can lookup.
 	# We should do all the geometry processing here so that we only have to do
 	# this once-off.
-	shapes_c = csv.reader(swallow_windows_unicode(gtfs.open('shapes.txt', 'r')))
+	#TODO
+	shapes_file = [x for x in gtfs.namelist() if 'shapes' in x][0]
+	shapes_c = csv.reader(swallow_windows_unicode(gtfs.open(shapes_file, 'r')))
 
 	header = shapes_c.next()
 	shape_id_col = header.index('shape_id')
@@ -151,7 +161,10 @@ def gtfs_routes(gtfs, output_f):
 	trips_ref = {}
 	route_time = {}
 
-	trips_c = csv.reader(swallow_windows_unicode(gtfs.open('trips.txt', 'r')))
+	#TODO
+	trips_file = [x for x in gtfs.namelist() if 'trips' in x][0]
+
+	trips_c = csv.reader(swallow_windows_unicode(gtfs.open(trips_file, 'r')))
 	header = trips_c.next()
 	route_id_col = header.index('route_id')
 	shape_id_col = header.index('shape_id')
@@ -191,7 +204,10 @@ def gtfs_routes(gtfs, output_f):
 	output_layer.crs = geojson.crs.Named('urn:ogc:def:crs:OGC:1.3:CRS84')
 
 	# now we have all the shapes available, translate the routes
-	routes_c = csv.reader(swallow_windows_unicode(gtfs.open('routes.txt', 'r')))
+	#TODO
+	routes_file = [x for x in gtfs.namelist() if 'routes' in x][0]
+
+	routes_c = csv.reader(swallow_windows_unicode(gtfs.open(routes_file, 'r')))
 	header = routes_c.next()
 	route_id_col = header.index('route_id')
 
@@ -288,7 +304,7 @@ def main():
 
 	# Open ZIP
 	gtfs = zipfile.ZipFile(options.input_gtfs, 'r')
-
+	print
 	if options.routes:
 		gtfs_routes(gtfs, options.output)
 	elif options.stops:
